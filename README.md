@@ -5,7 +5,10 @@
 需要在和真寻同一台计算机上开启[Star Trek Server Status](https://github.com/XKaguya/StarTrekOnline-ServerStatus)软件的Server功能。
 
 # 用法
+主动
 ```
 /STORecent
-与自动发送维护信息。
 ```
+被动
+
+自动发送维护相关信息。

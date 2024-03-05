@@ -7,12 +7,13 @@ def get_data(data):
     data = json.loads(data)
     
     return (
-        data['StatusCode'],
+        data['ShardStatus'],
         data['Days'],
         data['Hours'],
         data['Minutes'],
         data['Seconds'],
-        data['NewsContents']
+        data['NewsContents'],
+        data['RecentNews']
     )
 
 async def check_server():

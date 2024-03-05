@@ -39,20 +39,17 @@ Debug_Mode = Config.get_config("STO_Recent", "DEBUG_MODE")
 
 scheduler = require("nonebot_plugin_apscheduler").scheduler
 
-@scheduler.scheduled_job("interval", seconds=25, id="processor_a")
+@scheduler.scheduled_job("interval", seconds=20, id="processor_a")
 async def processor_a():
 	bot = get_bot()
-	# maintenance_details = await check_server()
 	maintenance_details = await check_server()
 	logger.info("Calling Function")
-	
 	if not os.path.exists(json_path):
 		with open(json_path, 'w') as f:
-			json.dump({'status': 'server is up', 'flag_0': 'false', 'flag_1': 'false', 'flag_2': 'true', 'flag_3': 'false'}, f)
+			json.dump({'status': 'server is up', 'flag_0': 'false', 'flag_1': 'false', 'flag_2': 'true'}, f)
 			# flag_0 是否在维护信息出现后发送过几时会维护标志位
 			# flag_1 是否发送过目前开始维护信息
 			# flag_2 是否在有公告的情况下发送过维护结束信息
-			# flag_3 是否在没有公告的情况下发送过维护结束信息
 	with open(json_path, 'r') as f:
 		existing_data = json.load(f)
 		
@@ -61,8 +58,8 @@ async def processor_a():
 		hours = maintenance_details[2]
 		minutes = maintenance_details[3]
 		seconds = maintenance_details[4]
-		logger.info(f"Return values: {maintenance_details}")
-		logger.info(f"Existing flags: {existing_data.get('flag_0')}, {existing_data.get('flag_1')}, {existing_data.get('flag_2')}, {existing_data.get('flag_3')}") 
+		logger.info(f"Return values: {maintenance_details[0]}")
+		logger.info(f"Existing flags: {existing_data.get('flag_0')}, {existing_data.get('flag_1')}, {existing_data.get('flag_2')}") 
 	
 		if maintenance_details[0] == 0 and existing_data.get("status") == 'server is up' and existing_data.get("flag_1") == 'false':
 			msg = f"STO目前正在维护，预计{days}天{hours}小时{minutes}分钟{seconds}秒后结束维护。"
@@ -70,43 +67,32 @@ async def processor_a():
 			for i in groups:
 				await bot.call_api('send_group_msg', **{'group_id': i, 'message': Message(msg)})
 				logger.info(f"Send {msg} to {i}")
-				logger.info(f"Written 'status': 'server is down', 'flag_0': 'true', 'flag_1': 'true', 'flag_2': 'false', 'flag_3': 'false' into files")
+				logger.info(f"Written 'status': 'server is down', 'flag_0': 'true', 'flag_1': 'true', 'flag_2': 'false' into files")
 			logger.info("Executed Path 1")
 			with open(json_path, 'w') as f:
-				json.dump({'status': 'server is down', 'flag_0': 'true', 'flag_1': 'true', 'flag_2': 'false', 'flag_3': 'false'}, f)
-    
+				json.dump({'status': 'server is down', 'flag_0': 'true', 'flag_1': 'true', 'flag_2': 'false'}, f)
+	
 		elif maintenance_details[0] == 1 and existing_data.get("flag_0") == 'false':
 			msg = f"STO将在{days}天{hours}小时{minutes}分钟{seconds}秒后开始维护。"
 			groups = Config.get_config("STO_Recent", "GROUPS")
 			for i in groups:
 				await bot.call_api('send_group_msg', **{'group_id': i, 'message': Message(msg)})
 				logger.info(f"Send {msg} to {i}")
-				logger.info(f"Written 'status': 'server is up', 'flag_0': 'true', 'flag_1': 'false', 'flag_2': 'false', 'flag_3': 'false' into files")
+				logger.info(f"Written 'status': 'server is up', 'flag_0': 'true', 'flag_1': 'false', 'flag_2': 'false' into files")
 			logger.info("Executed Path 2")
 			with open(json_path, 'w') as f:
-				json.dump({'status': 'server is up', 'flag_0': 'true', 'flag_1': 'false', 'flag_2': 'false', 'flag_3': 'false'}, f)
+				json.dump({'status': 'server is up', 'flag_0': 'true', 'flag_1': 'false', 'flag_2': 'false'}, f)
 		
-		elif maintenance_details[0] == 2 and existing_data.get('flag_2') == 'false':
+		elif maintenance_details[0] == 3 and existing_data.get('flag_2') == 'false':
 			msg = f"STO服务器已结束维护。"
 			groups = Config.get_config("STO_Recent", "GROUPS")
 			for i in groups:
 				await bot.call_api('send_group_msg', **{'group_id': i, 'message': Message(msg)})
 				logger.info(f"Send {msg} to {i}")
-				logger.info(f"Written 'status': 'server is up', 'flag_0': 'false', 'flag_1': 'false', 'flag_2': 'true', 'flag_3': 'false' into files")
+				logger.info(f"Written 'status': 'server is up', 'flag_0': 'false', 'flag_1': 'false', 'flag_2': 'true' into files")
 			logger.info("Executed Path 3")
 			with open(json_path, 'w') as f:
-				json.dump({'status': 'server is up', 'flag_0': 'false', 'flag_1': 'false', 'flag_2': 'true', 'flag_3': 'false'}, f)
-    
-		elif maintenance_details[0] == 3 and existing_data.get('flag_2') == 'false' and existing_data.get('flag_3') == 'false':
-			msg = f"STO服务器已结束维护。"
-			groups = Config.get_config("STO_Recent", "GROUPS")
-			for i in groups:
-				await bot.call_api('send_group_msg', **{'group_id': i, 'message': Message(msg)})
-				logger.info(f"Send {msg} to {i}")
-				logger.info(f"Written 'status': 'server is up', 'flag_0': 'false', 'flag_1': 'false', 'flag_2': 'false', 'flag_3': 'true' into files")
-			logger.info("Executed Path 4")
-			with open(json_path, 'w') as f:
-				json.dump({'status': 'server is up', 'flag_0': 'false', 'flag_1': 'false', 'flag_2': 'false', 'flag_3': 'true'}, f)
+				json.dump({'status': 'server is up', 'flag_0': 'false', 'flag_1': 'false', 'flag_2': 'true'}, f)
 
 storecent = on_command("STORecent", priority=5, block=True)
 
@@ -153,20 +139,47 @@ async def draw_server_status(bot: Bot, ev: Event):
 
 
 def get_split_data(data):
-    return data[0], data[1], data[2], data[3], data[4], data[5]
+	return data[0], data[1], data[2], data[3], data[4], data[5], data[6]
 
 async def draw_maintenance_message(message, server_status, background_image, draw, x=805, y=381):
-	font_small = ImageFont.truetype("msyhl.ttc", 20)
-	event_status, days, hours, minutes, seconds, news = message
+	font_small = ImageFont.truetype("msyhl.ttc", 30)
+	event_status, days, hours, minutes, seconds, news, recentEvents = message
+	logger.info(f"{recentEvents}")
+ 
+	y_offset = 40
+
+	for event in recentEvents:
+		title = event['Summary']
+		time_left = event['TimeTillEnd'].strip('days.')
+		start_date = event['StartDate']
+		end_date = event['EndDate']
+		logger.info(title)
+		logger.info(time_left)
+		logger.info(start_date)
+		logger.info(end_date)
+
+		if 'TimeTillStart' in event and event['TimeTillStart'] != '':
+			time_start = event['TimeTillStart'].strip('days.')
+			draw.text((x, y + y_offset), "活动将在 " + time_start + " 天后开启", fill="white", font=font_small)
+		
+		y_offset += 30
+
+		draw.text((x, y + y_offset), "活动 " + title, fill="white", font=font_small)
+		y_offset += 30
+
+		draw.text((x, y + y_offset), "活动将在 " + time_left + " 天后结束", fill="white", font=font_small)
+		y_offset += 30
+
+		draw.text((x, y + y_offset), "活动开始日期: " + start_date, fill="white", font=font_small)
+		y_offset += 30
+
+		draw.text((x, y + y_offset), "活动结束日期: " + end_date, fill="white", font=font_small)
+		y_offset += 30
+		
 
 	if event_status == 1:
 		msg = f"STO将在{days}天{hours}小时{minutes}分钟{seconds}秒后开始维护。"
 		draw.text((x, y), f"维护状态：即将维护", fill="white", font=font_small)
-		draw.text((x, y + 40), msg, fill="white", font=font_small)
-		
-	elif event_status == 2:
-		msg = f"STO服务器已结束维护。"
-		draw.text((x, y), f"维护状态：维护结束", fill="white", font=font_small)
 		draw.text((x, y + 40), msg, fill="white", font=font_small)
 		
 	elif event_status == 0:
@@ -174,9 +187,8 @@ async def draw_maintenance_message(message, server_status, background_image, dra
 		draw.text((x, y), f"维护状态：正在维护", fill="white", font=font_small)
 		draw.text((x, y + 40), msg, fill="white", font=font_small)
 
-
 async def draw_news(msg, bot: Bot, ev: Event, background_image):
-	event_status, days, hours, minutes, seconds, news = msg
+	event_status, days, hours, minutes, seconds, news, recentEvents = msg
 	news_data = json.dumps(news)
 	news_data = json.loads(news_data)
 	logger.info(news)

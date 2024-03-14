@@ -19,9 +19,13 @@
 在群中输入指令：
 `/STORecent`，真寻就会获取所有上述功能的信息并发送到群中。
 
+![image](https://github.com/XKaguya/zhenxun_STO_ServerChecker/assets/96401952/0d266223-c62f-4260-8d21-653d59546725)
+
 ## 被动用法
 
 真寻会自动获取维护信息并发送到配置文件定义的群中。
+
+![image](https://github.com/XKaguya/zhenxun_STO_ServerChecker/assets/96401952/6299851e-2110-4265-acb6-2ff6abd1a143)
 
 # TODO
 **合并插件STONews、STONews_Timer**

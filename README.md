@@ -13,7 +13,13 @@
 
 # 用法
 **若需使用自动重启STOChecker后端软件功能，请这样放置插件：**
+
+`STORecent文件夹` 
+
 ![image](https://github.com/XKaguya/zhenxun_STO_ServerChecker/assets/96401952/d0eae86d-2194-42fe-bce8-5ca1f052801f)
+
+`STOChecker文件夹`
+
 ![image](https://github.com/XKaguya/zhenxun_STO_ServerChecker/assets/96401952/3b7260bc-4e96-462b-b669-c97b21b5a8fe)
 
 ## 主动用法

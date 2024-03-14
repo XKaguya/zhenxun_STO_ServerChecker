@@ -6,11 +6,9 @@ from .utils.maintenance import SendInitiativeAsync
 from .utils.scheduler import ConnectWithBackendScheduler
 
 from nonebot import on_command, require, get_bot
-from nonebot.log import logger
-from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.adapters.onebot.v11.event import Event
 from configs.config import Config
-from nonebot.adapters.onebot.v11 import Bot, Message
+from nonebot.adapters.onebot.v11 import Bot
 
 __zx_plugin_name__ = "STO状态查询插件重制版"
 __plugin_usage__ = """

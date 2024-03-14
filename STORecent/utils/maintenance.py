@@ -3,7 +3,6 @@ from .connect import GetMaintenanceInfoAsync, CheckLinkAsync
 from nonebot.adapters.onebot.v11.event import Event
 from nonebot.adapters.onebot.v11 import Bot, Message
 from nonebot.log import logger
-# from loguru import logger
 from .error import ReceiveError, ConnectionError, ConnectionCloseError, SendError
 from .minfo import ShardStatus, MaintenanceInfo
 from .draw import draw_server_status
@@ -69,9 +68,6 @@ async def ConnectWithBackendAsync():
 
         except Exception as ex:
             logger.error(ex)
-    
-    except Exception as ex:
-        logger.error(ex)
 
     except ReceiveError as ex:
         logger.error(ex)

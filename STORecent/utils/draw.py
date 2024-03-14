@@ -3,7 +3,7 @@ from pathlib import Path
 from nonebot.log import logger
 from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.adapters.onebot.v11.event import Event
-from nonebot.adapters.onebot.v11 import Bot, Message
+from nonebot.adapters.onebot.v11 import Bot
 from configs.config import Config
 from .minfo import ShardStatus
 import textwrap

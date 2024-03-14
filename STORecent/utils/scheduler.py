@@ -1,12 +1,8 @@
-from nonebot import require, get_bot
 from configs.config import Config
 from .connect import GetMaintenanceInfoAsync
 from nonebot.log import logger
-# from loguru import logger
-from .error import ReceiveError, ConnectionError, ConnectionCloseError, SendError
 from .maintenance import SendPassiveAsync
 from nonebot.adapters.onebot.v11 import Bot
-import subprocess
 import os
 
 Debug_Mode = Config.get_config("STO_Recent", "DEBUG_MODE")

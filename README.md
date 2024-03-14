@@ -4,6 +4,10 @@
 # 安装
 需要在和真寻同一台计算机上开启[Star Trek Server Status](https://github.com/XKaguya/StarTrekOnline-ServerStatus)软件的Server功能。
 
+若是自动开启的STOChecker，则无需手动开启Server功能。
+
+不兼容旧版STOChecker。因为自动重启两步验证最终验证的是来自服务端的回信。
+
 # 功能
 **自动获取维护信息并发送到群中**
 

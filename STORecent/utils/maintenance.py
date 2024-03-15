@@ -1,17 +1,19 @@
 from configs.config import Config
 from .connect import GetMaintenanceInfoAsync, CheckLinkAsync
 from nonebot.adapters.onebot.v11.event import Event
-from nonebot.adapters.onebot.v11 import Bot, Message
+from nonebot.adapters.onebot.v11 import Bot
 from nonebot.log import logger
 from .error import ReceiveError, ConnectionError, ConnectionCloseError, SendError
 from .minfo import ShardStatus, MaintenanceInfo
 from .draw import draw_server_status
+from .utils import SendGroupMessageAsync
 import os
 import asyncio
 import subprocess
 import time
 from pathlib import Path
 import json
+
 
 json_path = Path(__file__).resolve().parent / "status.json"
 
@@ -82,18 +84,6 @@ async def ConnectWithBackendAsync():
         # if Debug_Mode:
         if True:
             logger.info("Function ConnectWithBackendAsync exited.")
-            
-async def SendGroupMessageAsync(Groups, Content, bot: Bot):
-    if len(Groups) == 0:
-        raise IndexError
-    elif len(Groups) == 1:
-        await bot.call_api('send_group_msg', **{'group_id': Groups[0], 'message': Message(Content)})
-        logger.info(f"Written 'status': 'server is down', 'flag_0': 'true', 'flag_1': 'true', 'flag_2': 'false' into files")
-    else:
-        for i in Groups:
-            await bot.call_api('send_group_msg', **{'group_id': i, 'message': Message(Content)})
-            logger.info(f"Send {Content} to {i}")
-            logger.info(f"Written 'status': 'server is down', 'flag_0': 'true', 'flag_1': 'true', 'flag_2': 'false' into files")
             
 async def Serializer():
     logger.info("Trying to serialize data...")

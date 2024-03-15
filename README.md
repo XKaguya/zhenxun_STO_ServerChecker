@@ -17,6 +17,10 @@
 
 **获取最新活动剩余时间/开始时间并显示在图片上**
 
+**获取新闻长图**
+
+**自动获取新闻发送到群中**
+
 # 用法
 **若需使用自动重启STOChecker后端软件功能，请这样放置插件：**
 
@@ -40,9 +44,6 @@
 真寻会自动获取维护信息并发送到配置文件定义的群中。
 
 ![image](https://github.com/XKaguya/zhenxun_STO_ServerChecker/assets/96401952/6299851e-2110-4265-acb6-2ff6abd1a143)
-
-# TODO
-**合并插件STONews、STONews_Timer**
 
 # 贡献
 如有任何Bug，欢迎在Issue中提出。

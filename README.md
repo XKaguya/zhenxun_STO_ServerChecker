@@ -37,7 +37,7 @@
 在群中输入指令：
 `/STORecent`，真寻就会获取所有上述功能的信息并发送到群中。
 
-![image](https://github.com/XKaguya/zhenxun_STO_ServerChecker/assets/96401952/0d266223-c62f-4260-8d21-653d59546725)
+![image](https://github.com/XKaguya/zhenxun_STO_ServerChecker/assets/96401952/c0d552fd-fec6-4bb8-b552-828f01f93c01)
 
 ## 被动用法
 

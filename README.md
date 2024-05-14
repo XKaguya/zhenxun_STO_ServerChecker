@@ -4,7 +4,7 @@
 名称灵感来源wws me recent。
 
 # 安装
-需要在和真寻同一台计算机上开启[Star Trek Server Status](https://github.com/XKaguya/StarTrekOnline-ServerStatus)软件的Server功能。
+需要在和真寻同一台计算机上开启[STOTool]([https://github.com/XKaguya/StarTrekOnline-ServerStatus](https://github.com/XKaguya/STOTool))软件的Server功能。
 
 若是自动开启的STOChecker，则无需手动开启Server功能。
 

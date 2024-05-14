@@ -94,6 +94,30 @@ async def GetPassiveType():
         except Exception as ex:
             logger.error(f"Error closing pipe: {ex}")
             raise ConnectionCloseError("Error closing pipe.", 5)
+        
+async def RefreshCacheAsync():
+    pipe_name = r'\\.\pipe\STOChecker'
+    pipe = None
+    
+    try:
+        pipe = await ConnectPipe(pipe_name)
+        
+        message = "rF"
+        
+        if (await SendAsync(pipe, message)):
+            return True
+        else:
+            raise ConnectionError("An error occurred while connecting to the pipe server.", 1)
+        
+    except Exception as ex:
+        raise ConnectionError("An error occurred while connecting to the pipe server.", 1)
+    finally:
+        try:
+            if pipe is not None:
+                pipe.close()
+        except Exception as ex:
+            logger.error(f"Error closing pipe: {ex}")
+            raise ConnectionCloseError("Error closing pipe.", 5)
     
 async def GetImage():
     pipe_name = r'\\.\pipe\STOChecker'

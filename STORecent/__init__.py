@@ -5,6 +5,7 @@ InitConfig()
 from .utils.maintenance import SendInitiativeAsync
 from .utils.scheduler import ConnectWithBackendScheduler
 from .utils.utils import SendGroupMessageAsync
+from .utils.connect import RefreshCacheAsync
 from .extensions.newsscreenshot import GetNewsScreenshot
 from .extensions.autonews import GetNewsAsync
 
@@ -69,3 +70,10 @@ async def _(bot: Bot, ev: Event):
     async with async_playwright() as playwright:
          Image = await GetNewsScreenshot(bot, ev, playwright)
     await storecent_screenshot.send(Image)
+    
+    
+storecent_refresh = on_command("RefreshCache", priority=5, block=True)
+
+@storecent_refresh.handle()
+async def _(bot: Bot, ev: Event):
+	await RefreshCacheAsync()

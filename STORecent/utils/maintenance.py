@@ -1,5 +1,5 @@
 from configs.config import Config
-from .connect import GetPassiveType, GetScreenshot, CheckLinkAsync
+from .connect import GetPassiveType, GetImage, CheckLinkAsync
 from .utils import SendGroupMessageAsync
 from nonebot.adapters.onebot.v11.event import Event
 from nonebot.adapters.onebot.v11 import MessageSegment
@@ -113,7 +113,7 @@ async def SendPassiveAsync(bot: Bot):
                 
 async def SendInitiativeAsync(bot: Bot, ev: Event):
     try:
-        if (await GetScreenshot()):
+        if (await GetImage()):
             parent_dir = Path(__file__).resolve().parent.parent
             img_path = os.path.join(parent_dir, 'msg.png')
             logger.info(img_path)

@@ -4,6 +4,7 @@ from nonebot.log import logger
 from .error import ReceiveError, ConnectionError, ConnectionCloseError, SendError
 from .mtype import ShardStatus
 from pathlib import Path
+import base64
 import os
 
 parent_dir = Path(__file__).resolve().parent.parent
@@ -94,25 +95,31 @@ async def GetPassiveType():
             logger.error(f"Error closing pipe: {ex}")
             raise ConnectionCloseError("Error closing pipe.", 5)
     
-async def GetScreenshot():
+async def GetImage():
     pipe_name = r'\\.\pipe\STOChecker'
     pipe = None
     
     try:
         pipe = await ConnectPipe(pipe_name)
         
-        message = "sS2"
+        message = "dI"
         
         if await SendAsync(pipe, message):
-            size_bytes = await RecvAsync(pipe, buffer_size=4)
-            img_size = int.from_bytes(size_bytes, byteorder='little')
-            logger.info(f"Server says image size is: {img_size}")
+            data = win32file.ReadFile(pipe.handle, 10000000)[1]
             
-            img_stream = await ReadFromPipeWithSizeAsync(pipe, img_size)
-            logger.info(f"The Real image size is: {img_size}")
+            logger.info(f"Size of data: {len(data)}")
+            
+            message = data.decode('utf-8')
+            
+            base64_parts = message.split(',')[1:]
+            base64_data = ''.join(base64_parts)
+
+            # Decode Base64 encoded data to `get` image data
+            image_data = base64.b64decode(base64_data)
+            
                 
             with open(img_path, 'wb') as f:
-                f.write(img_stream)
+                f.write(image_data)
             
             return True
 

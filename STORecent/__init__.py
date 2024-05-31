@@ -5,16 +5,20 @@ InitConfig()
 from .utils.maintenance import SendInitiativeAsync
 from .utils.scheduler import ConnectWithBackendScheduler
 from .utils.utils import SendGroupMessageAsync
-from .utils.connect import RefreshCacheAsync
-from .extensions.newsscreenshot import GetNewsScreenshot
+from .utils.connect import RefreshCacheAsync, GetNewsImage
 from .extensions.autonews import GetNewsAsync
 
 from nonebot import on_command, require, get_bot
 from nonebot.adapters.onebot.v11.event import Event
 from configs.config import Config
-from nonebot.adapters.onebot.v11 import Bot
+from nonebot.adapters.onebot.v11 import Bot, MessageSegment
 
-from playwright.async_api import async_playwright
+from pathlib import Path
+
+#from loguru import logger
+from nonebot.log import logger
+
+import os
 
 __zx_plugin_name__ = "STO状态查询插件重制版"
 __plugin_usage__ = """
@@ -67,11 +71,20 @@ storecent_screenshot = on_command("STONews", priority=5, block=True)
 
 @storecent_screenshot.handle()
 async def _(bot: Bot, ev: Event):
-    async with async_playwright() as playwright:
-         Image = await GetNewsScreenshot(bot, ev, playwright)
-    await storecent_screenshot.send(Image)
-    
-    
+	user_input = ev.get_plaintext()
+	index = int(user_input.replace('/STONews', '').strip())
+	
+	parent_dir = Path(__file__).resolve().parent.parent
+	parent_dir = os.path.join(parent_dir, 'STORecent')
+	news_img = os.path.join(parent_dir, 'news.png')
+	
+	success = await GetNewsImage(index)
+	if success:
+		img = MessageSegment.image(file=news_img)
+		await storecent_screenshot.send(img)
+	else:
+		await storecent_screenshot.send("获取新闻图片失败，请稍后再试。")
+
 storecent_refresh = on_command("RefreshCache", priority=5, block=True)
 
 @storecent_refresh.handle()

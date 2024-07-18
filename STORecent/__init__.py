@@ -1,12 +1,11 @@
-from .utils.initconfig import InitConfig
+from .utils.init import InitConfig
 
 InitConfig()
 
-from .utils.maintenance import SendInitiativeAsync
+from .utils.messages import SendGroupMessageAsync
 from .utils.scheduler import ConnectWithBackendScheduler
-from .utils.utils import SendGroupMessageAsync
-from .utils.connect import RefreshCacheAsync, GetNewsImage
-from .extensions.autonews import GetNewsAsync
+from .utils.connect import GetIfNewsUpdated, GetNewsImage, RefreshCacheAsync
+from .utils.maintenance import SendInitiativeAsync
 
 from nonebot import on_command, require, get_bot
 from nonebot.adapters.onebot.v11.event import Event
@@ -28,7 +27,7 @@ STORecent
 """.strip()
 __plugin_des__ = "STO状态查询插件重制版"
 __plugin_type__ = ("一些工具",)
-__plugin_cmd__ = ["STO_Recent"]
+__plugin_cmd__ = ["STORecent"]
 
 __plugin_settings__ = {
 	"level": 5,
@@ -53,9 +52,17 @@ async def SchedulerFunc():
 		
 	await ConnectWithBackendScheduler(bot)
  
-	msg = await GetNewsAsync()
+	if Debug_Mode:
+		logger.info("Calling GetIfNewsUpdated...")
  
-	if msg != 0:
+	success = await GetIfNewsUpdated()
+ 
+	if success:
+		parent_dir = Path(__file__).resolve().parent.parent
+		parent_dir = os.path.join(parent_dir, 'STORecent')
+		autonews_img = os.path.join(parent_dir, 'autonews_img.png')
+		msg = MessageSegment.image(file=autonews_img)
+  
 		await SendGroupMessageAsync(Groups, msg, bot)
 		
 storecent = on_command("STORecent", priority=5, block=True)

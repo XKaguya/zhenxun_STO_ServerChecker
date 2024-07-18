@@ -115,14 +115,12 @@ async def GetIfNewsUpdated():
             try:
                 with open(autonews_img, 'wb') as f:
                     f.write(image_data)
-                    logger.info("Server responses that news hash has updated.")
                     logger.info(f"Image written to {autonews_img}")
                     return True
             except Exception as write_ex:
                 logger.error(f"File write error: {write_ex}")
                 return False
         else:
-            logger.info("Server return with no update.")
             return False
         
     except asyncio.TimeoutError:

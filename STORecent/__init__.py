@@ -2,7 +2,7 @@ from .utils.init import InitConfig
 
 InitConfig()
 
-from .utils.messages import SendGroupMessageAsync
+from .utils.messages import SendGroupMessageAsync, SendGroupImageMessageAsync
 from .utils.scheduler import ConnectWithBackendScheduler
 from .utils.connect import GetIfNewsUpdated, GetNewsImage, RefreshCacheAsync
 from .utils.maintenance import SendInitiativeAsync
@@ -63,7 +63,7 @@ async def SchedulerFunc():
 		autonews_img = os.path.join(parent_dir, 'autonews_img.png')
 		msg = MessageSegment.image(file=autonews_img)
   
-		await SendGroupMessageAsync(Groups, msg, bot)
+		await SendGroupImageMessageAsync(Groups, msg, bot)
 		
 storecent = on_command("STORecent", priority=5, block=True)
 

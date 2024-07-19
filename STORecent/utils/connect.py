@@ -74,6 +74,9 @@ async def GetImage():
         if response is not None:
             logger.info(f"Size of data: {len(response)}")
             
+            if response == "null":
+                return "null"
+            
             if "," in response:
                 base64_parts = response.split(',')[1:]
                 base64_data = ''.join(base64_parts)
@@ -136,6 +139,9 @@ async def GetNewsImage(index):
         response = await asyncio.wait_for(SendAndReceive(message), timeout=20)
         if response is not None:
             logger.info(f"Size of data: {len(response)}")
+            
+            if response == "null":
+                return "null"
             
             image_data = base64.b64decode(response)
                 

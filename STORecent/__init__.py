@@ -72,7 +72,10 @@ storecent = on_command("STORecent", priority=5, block=True)
 @storecent.handle()
 async def _(bot: Bot, ev: Event):
 	Image = await SendInitiativeAsync(bot, ev)
-	await storecent.send(Image)
+	if Image != "null":
+		await storecent.send(Image)
+	else:
+		await storecent.send("后端返回NULL错误或正在刷新缓存，请检查日志或耐心等待。")
 
 storecent_screenshot = on_command("STONews", priority=5, block=True)
 
@@ -87,8 +90,11 @@ async def _(bot: Bot, ev: Event):
 	
 	success = await GetNewsImage(index)
 	if success:
-		img = MessageSegment.image(file=news_img)
-		await storecent_screenshot.send(img)
+		if success == "null":
+			await storecent_screenshot.send("后端返回NULL错误或正在刷新缓存，请检查日志或耐心等待。")
+		else:
+			img = MessageSegment.image(file=news_img)
+			await storecent_screenshot.send(img)
 	else:
 		await storecent_screenshot.send("获取新闻图片失败，请稍后再试。")
 

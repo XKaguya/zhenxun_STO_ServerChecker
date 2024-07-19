@@ -88,10 +88,13 @@ async def SendPassiveAsync(bot: Bot):
             msg = None
 
 async def SendInitiativeAsync(bot: Bot, ev: Event):
-    if await GetImage():
+    rst = await GetImage()
+    if rst != "null":
         parent_dir = Path(__file__).resolve().parent.parent
         img_path = os.path.join(parent_dir, 'msg.png')
         logger.info(img_path)
         
         img = MessageSegment.image(file=img_path)
         return img
+    else:
+        return "null"

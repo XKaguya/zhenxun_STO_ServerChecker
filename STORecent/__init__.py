@@ -88,12 +88,14 @@ async def _(bot: Bot, ev: Event):
 	parent_dir = os.path.join(parent_dir, 'STORecent')
 	news_img = os.path.join(parent_dir, 'news.png')
 	
-	success = await GetNewsImage(index)
-	if success:
-		if success == "null":
+	success, NewsLink = await GetNewsImage(index)
+	if success and NewsLink is not None:
+		if success == "null" and NewsLink is None:
 			await storecent_screenshot.send("后端返回NULL错误或正在刷新缓存，请检查日志或耐心等待。")
 		else:
 			img = MessageSegment.image(file=news_img)
+
+			await storecent_screenshot.send(f"新闻索引：{index} \n新闻链接： {NewsLink}")
 			await storecent_screenshot.send(img)
 	else:
 		await storecent_screenshot.send("获取新闻图片失败，请稍后再试。")

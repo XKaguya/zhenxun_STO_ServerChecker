@@ -7,6 +7,7 @@ import base64
 import os
 import websockets
 import asyncio
+import json
 
 parent_dir = Path(__file__).resolve().parent.parent
 img_path = os.path.join(parent_dir, 'msg.png')
@@ -137,25 +138,38 @@ async def GetNewsImage(index):
     try:
         message = f"{Command.ClientAskForNews.name} {index}"
         response = await asyncio.wait_for(SendAndReceive(message), timeout=20)
+        
         if response is not None:
             logger.info(f"Size of data: {len(response)}")
-            
+
             if response == "null":
                 return "null"
             
-            image_data = base64.b64decode(response)
+            # 解析JSON响应
+            try:
+                result = json.loads(response)
+                news_link = result.get("NewsLink")
+                base64_image = result.get("Base64Screenshot")
+            except json.JSONDecodeError as decode_ex:
+                logger.error(f"Failed to decode JSON response: {decode_ex}")
+                return False
+
+            if base64_image == "null" or not base64_image:
+                return "null"
+
+            image_data = base64.b64decode(base64_image)
                 
             try:
                 with open(news_img, 'wb') as f:
                     f.write(image_data)
                     logger.info(f"Image written to {img_path}")
-                    return True
+                    return True, news_link
             except Exception as write_ex:
                 logger.error(f"File write error: {write_ex}")
-                return False
+                return False, None
     except asyncio.TimeoutError:
         logger.error("GetNewsImage timed out")
-        return False
+        return False, None
     except Exception as ex:
-        logger.error(f"An error occurred while connecting to the websocket server.: {ex}")
-        return False
+        logger.error(f"An error occurred while connecting to the websocket server: {ex}")
+        return False, None

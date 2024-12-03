@@ -1,13 +1,16 @@
-from nonebot.log import logger
-from configs.config import Config
-from .mtype import ShardStatus
-from .command import Command
-from pathlib import Path
 import base64
 import os
-import websockets
 import asyncio
 import json
+from pathlib import Path
+
+import websockets
+
+from nonebot.log import logger
+from zhenxun.configs.config import Config
+from .mtype import ShardStatus
+from .command import Command
+
 
 parent_dir = Path(__file__).resolve().parent.parent
 img_path = os.path.join(parent_dir, 'msg.png')
@@ -15,6 +18,7 @@ news_img = os.path.join(parent_dir, 'news.png')
 autonews_img = os.path.join(parent_dir, 'autonews_img.png')
 
 WebSocket = Config.get_config("STO_Recent", "WebSocket")
+Debug_Mode = Config.get_config("STO_Recent", "DEBUG_MODE")
 
 if WebSocket is not None:
     websocket_uri = WebSocket
@@ -34,7 +38,7 @@ async def SendAndReceive(message):
 async def CheckLinkAsync():
     try:
         message = Command.ClientCheckServerAlive.name
-        response = await asyncio.wait_for(SendAndReceive(message), timeout=20)
+        response = await asyncio.wait_for(SendAndReceive(message), timeout=40)
         return response == "Success"
     except asyncio.TimeoutError:
         logger.error("CheckLinkAsync timed out")
@@ -46,7 +50,7 @@ async def CheckLinkAsync():
 async def GetPassiveType():
     try:
         message = Command.ClientAskForPassiveType.name
-        response = await asyncio.wait_for(SendAndReceive(message), timeout=20)
+        response = await asyncio.wait_for(SendAndReceive(message), timeout=40)
         if response is not None:
             status_enum = ShardStatus[response]
             return status_enum
@@ -58,11 +62,26 @@ async def GetPassiveType():
     except Exception as ex:
         logger.error(f"An error occurred while connecting to the websocket server.: {ex}")
         return False
+    
+async def GetCalendar():
+    try:
+        message = Command.ClientAskForCalendar.name
+        response = await asyncio.wait_for(SendAndReceive(message), timeout=40)
+        if response is not None:
+            return response
+        else:
+            return False
+    except asyncio.TimeoutError:
+        logger.error("GetCalendar timed out")
+        return False
+    except Exception as ex:
+        logger.error(f"An error occurred while connecting to the websocket server.: {ex}")
+        return False
 
 async def RefreshCacheAsync():
     try:
         message = Command.ClientAskForRefreshCache.name
-        await asyncio.wait_for(SendAndReceive(message), timeout=20)
+        await asyncio.wait_for(SendAndReceive(message), timeout=40)
     except asyncio.TimeoutError:
         logger.error("RefreshCacheAsync timed out")
     except Exception as ex:
@@ -71,9 +90,10 @@ async def RefreshCacheAsync():
 async def GetImage():
     try:
         message = Command.ClientAskForDrawImage.name
-        response = await asyncio.wait_for(SendAndReceive(message), timeout=20)
+        response = await asyncio.wait_for(SendAndReceive(message), timeout=40)
         if response is not None:
-            logger.info(f"Size of data: {len(response)}")
+            if Debug_Mode:
+                logger.info(f"Size of data: {len(response)}")
             
             if response == "null":
                 return "null"
@@ -91,7 +111,8 @@ async def GetImage():
                 try:
                     with open(img_path, 'wb') as f:
                         f.write(image_data)
-                        logger.info(f"Image written to {img_path}")
+                        if Debug_Mode:
+                            logger.info(f"Image written to {img_path}")
                         return True
                 except Exception as write_ex:
                     logger.error(f"File write error: {write_ex}")
@@ -110,9 +131,10 @@ async def GetImage():
 async def GetIfNewsUpdated():
     try:
         message = Command.ClientAskIfHashChanged.name
-        response = await asyncio.wait_for(SendAndReceive(message), timeout=20)
+        response = await asyncio.wait_for(SendAndReceive(message), timeout=40)
         if response != "null":
-            logger.info(f"Size of data: {len(response)}")
+            if Debug_Mode:
+                logger.info(f"Size of data: {len(response)}")
             
             image_data = base64.b64decode(response)
                 
@@ -137,15 +159,15 @@ async def GetIfNewsUpdated():
 async def GetNewsImage(index):
     try:
         message = f"{Command.ClientAskForNews.name} {index}"
-        response = await asyncio.wait_for(SendAndReceive(message), timeout=20)
+        response = await asyncio.wait_for(SendAndReceive(message), timeout=40)
         
         if response is not None:
-            logger.info(f"Size of data: {len(response)}")
+            if Debug_Mode:
+                logger.info(f"Size of data: {len(response)}")
 
             if response == "null":
                 return "null"
             
-            # 解析JSON响应
             try:
                 result = json.loads(response)
                 news_link = result.get("NewsLink")
@@ -162,7 +184,8 @@ async def GetNewsImage(index):
             try:
                 with open(news_img, 'wb') as f:
                     f.write(image_data)
-                    logger.info(f"Image written to {img_path}")
+                    if Debug_Mode:
+                        logger.info(f"Image written to {img_path}")
                     return True, news_link
             except Exception as write_ex:
                 logger.error(f"File write error: {write_ex}")

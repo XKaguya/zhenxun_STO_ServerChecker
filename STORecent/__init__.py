@@ -1,31 +1,29 @@
+import os
+from pathlib import Path
+
+from nonebot import on_command, require, get_bot
+from nonebot.adapters.onebot.v11 import Bot, MessageSegment
+from nonebot.adapters.onebot.v11.event import Event
+from nonebot.log import logger
+
+from zhenxun.configs.config import Config
 from .utils.init import InitConfig
+from .utils.messages import SendGroupMessageAsync
+from .utils.scheduler import ConnectWithBackendScheduler
+from .utils.connect import GetCalendar, GetIfNewsUpdated, GetNewsImage, RefreshCacheAsync
+from .utils.maintenance import SendInitiativeAsync
 
 InitConfig()
 
-from .utils.messages import SendGroupMessageAsync, SendGroupImageMessageAsync
-from .utils.scheduler import ConnectWithBackendScheduler
-from .utils.connect import GetIfNewsUpdated, GetNewsImage, RefreshCacheAsync
-from .utils.maintenance import SendInitiativeAsync
 
-from nonebot import on_command, require, get_bot
-from nonebot.adapters.onebot.v11.event import Event
-from configs.config import Config
-from nonebot.adapters.onebot.v11 import Bot, MessageSegment
-
-from pathlib import Path
-
-#from loguru import logger
-from nonebot.log import logger
-
-import os
-
-__zx_plugin_name__ = "STO状态查询插件重制版"
+__zx_plugin_name__ = "STO状态查询插件"
 __plugin_usage__ = """
 usage：
-STORecent
-例：STORecent
+/STORecent 				| /STOR
+/STONews [Index]		| /STON [Index]
+/STOCalendar			| /STOC
 """.strip()
-__plugin_des__ = "STO状态查询插件重制版"
+__plugin_des__ = "STO状态查询插件"
 __plugin_type__ = ("一些工具",)
 __plugin_cmd__ = ["STORecent"]
 
@@ -62,12 +60,12 @@ async def SchedulerFunc():
 		parent_dir = os.path.join(parent_dir, 'STORecent')
 		autonews_img = os.path.join(parent_dir, 'autonews_img.png')
 		msg = MessageSegment.image(file=autonews_img)
-  
-		await SendGroupImageMessageAsync(Groups, msg, bot)
-		
-storecent = on_command("STORecent", priority=5, block=True)
+
+		await SendGroupMessageAsync(Groups, msg, bot)
+
 
 # Initiative
+storecent = on_command("STORecent", aliases={"STOR", "STORecent", "stor", "storecent"}, priority=5, block=True)
 
 @storecent.handle()
 async def _(bot: Bot, ev: Event):
@@ -77,12 +75,30 @@ async def _(bot: Bot, ev: Event):
 	else:
 		await storecent.send("后端返回NULL错误或正在刷新缓存，请检查日志或耐心等待。")
 
-storecent_screenshot = on_command("STONews", priority=5, block=True)
+storecent_screenshot = on_command("STONews", aliases={"STON", "STO新闻", "ston"}, priority=5, block=True)
 
 @storecent_screenshot.handle()
 async def _(bot: Bot, ev: Event):
 	user_input = ev.get_plaintext()
-	index = int(user_input.replace('/STONews', '').strip())
+	
+	index = 0
+	
+	possible_prefixes = ["/STONews", "/STON", "/STO新闻", "/ston", "/stonews"]
+	prefix = next((prefix for prefix in possible_prefixes if user_input.startswith(prefix)), None)
+	
+	if prefix:
+		try:
+			stripped_input = user_input.replace(prefix, "").strip()
+		
+			if stripped_input:
+				try:
+					index = int(stripped_input)
+				except ValueError:
+					await storecent_screenshot.send("输入的索引无效，使用默认索引 0。")
+			else:
+				await storecent_screenshot.send("未输入索引，使用默认索引 0。")
+		except ValueError:
+			await storecent_screenshot.send("输入的索引无效，使用默认索引 0。")
 	
 	parent_dir = Path(__file__).resolve().parent.parent
 	parent_dir = os.path.join(parent_dir, 'STORecent')
@@ -100,8 +116,17 @@ async def _(bot: Bot, ev: Event):
 	else:
 		await storecent_screenshot.send("获取新闻图片失败，请稍后再试。")
 
-storecent_refresh = on_command("RefreshCache", priority=5, block=True)
+storecent_refresh = on_command("RefreshCache", aliases={"RC"}, priority=5, block=True)
 
 @storecent_refresh.handle()
 async def _(bot: Bot, ev: Event):
 	await RefreshCacheAsync()
+
+storecent_getcalendar = on_command("STOCalendar", aliases={"STOC", "STO日历", "stoc"}, priority=5, block=True)
+
+@storecent_getcalendar.handle()
+async def _(bot: Bot, ev: Event):
+	result = await GetCalendar()
+
+	if result is not False or None:
+		await storecent_getcalendar.send(result)

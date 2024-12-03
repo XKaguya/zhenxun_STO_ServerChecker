@@ -1,29 +1,20 @@
-from nonebot.adapters.onebot.v11 import Bot, Message
+from nonebot.adapters.onebot.v11 import Bot
 from nonebot.log import logger
 
-async def SendGroupMessageAsync(Groups, Content, bot: Bot):
-    if len(Groups) == 0:
-        raise IndexError
+async def SendGroupMessageAsync(Groups, Content, bot: Bot, max_retries=3):
+    if not Groups:
+        logger.error("Groups list is empty.")
+        return
     
-    elif len(Groups) == 1:
-        await bot.call_api('send_group_msg', **{'group_id': Groups[0], 'message': Message(Content)})
-        logger.info(f"Send {Content} to {Groups[0]}")
-
-    else:
-        for i in Groups:
-            await bot.call_api('send_group_msg', **{'group_id': i, 'message': Message(Content)})
-            logger.info(f"Send {Content} to {i}")
-			
-			
-async def SendGroupImageMessageAsync(Groups, Content, bot: Bot):
-    if len(Groups) == 0:
-        raise IndexError
-    
-    elif len(Groups) == 1:
-        await bot.call_api('send_group_msg', **{'group_id': Groups[0], 'message': Content})
-        logger.info(f"Send {Content} to {Groups[0]}")
-
-    else:
-        for i in Groups:
-            await bot.call_api('send_group_msg', **{'group_id': i, 'message': Content})
-            logger.info(f"Send {Content} to {i}")
+    for group in Groups:
+        retries = 0
+        while retries < max_retries:
+            try:
+                await bot.call_api('send_group_msg', **{'group_id': group, 'message': Content})
+                logger.info(f"Successfully sent '{Content}' to group {group}")
+                break
+            except Exception as ex:
+                retries += 1
+                logger.warning(f"Attempt {retries} failed to send message to group {group}: {ex}")
+                if retries >= max_retries:
+                    logger.error(f"Failed to send message to group {group} after {max_retries} attempts.")

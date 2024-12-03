@@ -1,15 +1,17 @@
-from configs.config import Config
-from .connect import GetPassiveType, GetImage, CheckLinkAsync
-from .messages import SendGroupMessageAsync
-from nonebot.adapters.onebot.v11.event import Event
-from nonebot.adapters.onebot.v11 import MessageSegment
-from nonebot.adapters.onebot.v11 import Bot
-from nonebot.log import logger
 import os
 import asyncio
 import subprocess
 from pathlib import Path
+
+from nonebot.log import logger
+from nonebot.adapters.onebot.v11 import Bot, MessageSegment
+from nonebot.adapters.onebot.v11.event import Event
+
+from zhenxun.configs.config import Config
+from .connect import GetPassiveType, GetImage, CheckLinkAsync
+from .messages import SendGroupMessageAsync
 from .mtype import ShardStatus
+
 
 Debug_Mode = Config.get_config("STO_Recent", "DEBUG_MODE")
 
@@ -20,11 +22,13 @@ Exe = os.path.join(Exe_Path, 'STOTool.exe')
 Groups = Config.get_config("STO_Recent", "GROUPS")
 
 async def ConnectWithBackendAsync():
-    logger.info("Trying to connect with backend program...")
+    if Debug_Mode:
+        logger.info("Trying to connect with backend program...")
     
     PassiveType = await GetPassiveType()
     if PassiveType:
-        logger.success("Backend responded.")
+        if Debug_Mode:
+            logger.success("Backend responded.")
         return PassiveType
     else:
         try:
@@ -54,7 +58,8 @@ async def ConnectWithBackendAsync():
                 PassiveType = await GetPassiveType()
                 
                 if PassiveType:
-                    logger.success("Backend responded.")
+                    if Debug_Mode:
+                        logger.success("Backend responded.")
                     return PassiveType
             else:
                 logger.error("Failed to start STOChecker.")
@@ -84,7 +89,8 @@ async def SendPassiveAsync(bot: Bot):
             await SendGroupMessageAsync(Groups, msg, bot)
             
         case ShardStatus.Null:
-            logger.info("Null return. There might be something wrong on the backend.")
+            if Debug_Mode:
+                logger.info("Null return.")
             msg = None
 
 async def SendInitiativeAsync(bot: Bot, ev: Event):
@@ -92,7 +98,8 @@ async def SendInitiativeAsync(bot: Bot, ev: Event):
     if rst != "null":
         parent_dir = Path(__file__).resolve().parent.parent
         img_path = os.path.join(parent_dir, 'msg.png')
-        logger.info(img_path)
+        if Debug_Mode:
+            logger.info(img_path)
         
         img = MessageSegment.image(file=img_path)
         return img

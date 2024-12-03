@@ -12,7 +12,7 @@
 
 主动功能需要新版STOTool，否则您可能需要低版本的本插件。
 
-*欲使用最新版STOTool与旧版插件，需要手动开启`LegacyPipeMode`*
+~~*欲使用最新版STOTool与旧版插件，需要手动开启`LegacyPipeMode`*~~
 
 # 功能
 * 自动获取维护信息并发送到群中

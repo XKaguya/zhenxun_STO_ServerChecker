@@ -1,6 +1,14 @@
 # zhenxun_STO_ServerChecker
 真寻的Star Trek Online服务器状态查询插件，又名STORecent。
 
+<div align="center">
+
+[![Version](https://img.shields.io/github/v/release/XKaguya/zhenxun_STO_ServerChecker?sort=semver&style=flat-square&color=8DBBE9&label=Version)]()
+[![GitHub Issues](https://img.shields.io/github/issues/XKaguya/zhenxun_STO_ServerChecker/total?style=flat-square&label=Issues&color=d77982)](https://github.com/XKaguya/zhenxun_STO_ServerChecker)
+![Downloads](https://img.shields.io/github/downloads/XKaguya/zhenxun_STO_ServerChecker/total?style=flat-square&label=Downloads&color=d77982)
+
+</div>
+
 名称灵感来源wws me recent。
 
 # 安装
